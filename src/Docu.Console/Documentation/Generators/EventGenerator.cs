@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Docu.Parsing.Comments;
 using Docu.Parsing.Model;
@@ -8,27 +9,31 @@ namespace Docu.Documentation.Generators
     {
         private readonly IDictionary<Identifier, IReferencable> matchedAssociations;
 
-        public EventGenerator(IDictionary<Identifier, IReferencable> matchedAssociations, ICommentParser commentParser)
-            : base(commentParser)
+        public EventGenerator( IDictionary<Identifier, IReferencable> matchedAssociations, ICommentParser commentParser )
+            : base( commentParser )
         {
             this.matchedAssociations = matchedAssociations;
         }
 
-        public void Add(List<Namespace> namespaces, DocumentedEvent association)
+        public void Add( List<Namespace> namespaces, DocumentedEvent association )
         {
-            if (association.Event == null) return;
+            try
+            {
+                if( association.Event == null ) return;
 
-            var ns = FindNamespace(association, namespaces);
-            var type = FindType(ns, association);
+                var ns = FindNamespace( association, namespaces );
+                var type = FindType( ns, association );
 
-            var doc = Event.Unresolved(Identifier.FromEvent(association.Event, association.TargetType), type);
+                var doc = Event.Unresolved( Identifier.FromEvent( association.Event, association.TargetType ), type );
 
-            ParseSummary(association, doc);
-            ParseRemarks(association, doc);
-            ParseExample(association, doc);
+                ParseSummary( association, doc );
+                ParseRemarks( association, doc );
+                ParseExample( association, doc );
 
-            matchedAssociations.Add(association.Name, doc);
-            type.AddEvent(doc);
+                matchedAssociations.Add( association.Name, doc );
+                type.AddEvent( doc );
+            }
+            catch( Exception ) { }
         }
     }
 }

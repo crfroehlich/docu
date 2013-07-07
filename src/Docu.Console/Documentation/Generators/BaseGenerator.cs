@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -11,86 +12,126 @@ namespace Docu.Documentation.Generators
     {
         private readonly ICommentParser commentParser;
 
-        protected BaseGenerator(ICommentParser commentParser)
+        protected BaseGenerator( ICommentParser commentParser )
         {
             this.commentParser = commentParser;
         }
 
-        private void ParseSummary(XmlNode node, IDocumentationElement doc)
+        private void ParseSummary( XmlNode node, IDocumentationElement doc )
         {
-            if (node != null)
-                doc.Summary = new Summary(commentParser.ParseNode(node));
+            try
+            {
+                if( node != null )
+                    doc.Summary = new Summary( commentParser.ParseNode( node ) );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseParamSummary(IDocumentationMember member, IDocumentationElement doc)
+        protected void ParseParamSummary( IDocumentationMember member, IDocumentationElement doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("param[@name='" + doc.Name + "']");
+                var node = member.Xml.SelectSingleNode( "param[@name='" + doc.Name + "']" );
 
-            ParseSummary(node, doc);
+                ParseSummary( node, doc );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseValue(IDocumentationMember member, IDocumentationElement doc)
+        protected void ParseValue( IDocumentationMember member, IDocumentationElement doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("value");
+                var node = member.Xml.SelectSingleNode( "value" );
 
-            if (node != null)
-                doc.Value = new Value(commentParser.ParseNode(node));
+                if( node != null )
+                    doc.Value = new Value( commentParser.ParseNode( node ) );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseSummary(IDocumentationMember member, IDocumentationElement doc)
+        protected void ParseSummary( IDocumentationMember member, IDocumentationElement doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("summary");
+                var node = member.Xml.SelectSingleNode( "summary" );
 
-            ParseSummary(node, doc);
+                ParseSummary( node, doc );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseRemarks(IDocumentationMember member, IDocumentationElement doc)
+        protected void ParseRemarks( IDocumentationMember member, IDocumentationElement doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("remarks");
+                var node = member.Xml.SelectSingleNode( "remarks" );
 
-            if (node != null)
-                doc.Remarks = new Remarks(commentParser.ParseNode(node));
+                if( node != null )
+                    doc.Remarks = new Remarks( commentParser.ParseNode( node ) );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseExample(IDocumentationMember member, IDocumentationElement doc)
+        protected void ParseExample( IDocumentationMember member, IDocumentationElement doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("example");
+                var node = member.Xml.SelectSingleNode( "example" );
 
-            if (node != null)
-                doc.Example = new MultilineCode(commentParser.ParseNode(node, new ParseOptions { PreserveWhitespace = true }));
+                if( node != null )
+                    doc.Example = new MultilineCode( commentParser.ParseNode( node, new ParseOptions { PreserveWhitespace = true } ) );
+            }
+            catch( Exception ) { }
         }
 
-        protected void ParseReturns(IDocumentationMember member, Method doc)
+        protected void ParseReturns( IDocumentationMember member, Method doc )
         {
-            if (member.Xml == null) return;
+            try
+            {
+                if( member.Xml == null ) return;
 
-            var node = member.Xml.SelectSingleNode("returns");
+                var node = member.Xml.SelectSingleNode( "returns" );
 
-            if (node != null)
-                doc.Returns = new Summary(commentParser.ParseNode(node));
+                if( node != null )
+                    doc.Returns = new Summary( commentParser.ParseNode( node ) );
+            }
+            catch( Exception ) { }
         }
 
 
-        protected Namespace FindNamespace(IDocumentationMember association, List<Namespace> namespaces)
+        protected Namespace FindNamespace( IDocumentationMember association, List<Namespace> namespaces )
         {
-            var identifier = Identifier.FromNamespace(association.TargetType.Namespace);
-            return namespaces.Find(x => x.IsIdentifiedBy(identifier));
+            Namespace ns = null;
+            try
+            {
+                var identifier = Identifier.FromNamespace( association.TargetType.Namespace );
+                ns = namespaces.Find( x => x.IsIdentifiedBy( identifier ) );
+            }
+            catch( Exception ) { }
+            return ns;
         }
 
-        protected DeclaredType FindType(Namespace ns, IDocumentationMember association)
+        protected DeclaredType FindType( Namespace ns, IDocumentationMember association )
         {
-            var typeName = Identifier.FromType(association.TargetType);
-            return ns.Types.FirstOrDefault(x => x.IsIdentifiedBy(typeName));
+            DeclaredType dt = null;
+            try
+            {
+                var typeName = Identifier.FromType( association.TargetType );
+                dt = ns.Types.FirstOrDefault( x => x.IsIdentifiedBy( typeName ) );
+            }
+            catch( Exception ) { }
+            return dt;
         }
     }
 }

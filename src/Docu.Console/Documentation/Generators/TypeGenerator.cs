@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Docu.Parsing.Comments;
 using Docu.Parsing.Model;
@@ -8,26 +9,39 @@ namespace Docu.Documentation.Generators
     {
         private readonly IDictionary<Identifier, IReferencable> matchedAssociations;
 
-        public TypeGenerator(IDictionary<Identifier, IReferencable> matchedAssociations, ICommentParser commentParser)
-            : base(commentParser)
+        public TypeGenerator( IDictionary<Identifier, IReferencable> matchedAssociations, ICommentParser commentParser )
+            : base( commentParser )
         {
             this.matchedAssociations = matchedAssociations;
         }
 
-        public void Add(List<Namespace> namespaces, DocumentedType association)
+        public void Add( List<Namespace> namespaces, DocumentedType association )
         {
-            var ns = FindNamespace(association, namespaces);
-            DeclaredType doc = DeclaredType.Unresolved((TypeIdentifier)association.Name, association.TargetType, ns);
+            try
+            {
+                if( null != namespaces && null != association )
+                {
+                    var ns = FindNamespace( association, namespaces );
+                    if( null != ns )
+                    {
+                        DeclaredType doc = DeclaredType.Unresolved( (TypeIdentifier) association.Name, association.TargetType, ns );
+                        if( null != doc )
+                        {
+                            ParseSummary( association, doc );
+                            ParseRemarks( association, doc );
+                            ParseValue( association, doc );
+                            ParseExample( association, doc );
 
-            ParseSummary(association, doc);
-            ParseRemarks(association, doc);
-            ParseValue(association, doc);
-            ParseExample(association, doc);
+                            if( matchedAssociations.ContainsKey( association.Name ) ) return;
 
-            if (matchedAssociations.ContainsKey(association.Name)) return;
-
-            matchedAssociations.Add(association.Name, doc);
-            ns.AddType(doc);
+                            matchedAssociations.Add( association.Name, doc );
+                            ns.AddType( doc );
+                        }
+                    }
+                }
+            }
+            catch( Exception ) { }
         }
+
     }
 }
